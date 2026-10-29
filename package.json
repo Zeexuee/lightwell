@@ -1,0 +1,9 @@
+{
+	"name": "lightwell",
+	"version": "0.0.1",
+	"private": true,
+	"description": "projek ini di dedikasikan untuk belajar pribadi, dan silahkan gunakan jika butuh template yang masih kosong",
+	"scripts": {
+		"start": "node server/app.js"
+	}
+}
