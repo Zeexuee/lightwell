@@ -1,23 +1,27 @@
 // Controller berisi proses untuk setiap fitur.
 const itemController = require('../controllers/itemController');
 
-// Helper untuk mengirim response JSON secara konsisten.
+// ambil Utilitis dari http.js
+// ult = readJson, sendJson
 const { sendJson } = require('../utils/http');
 
-// Router adalah pintu masuk setiap request setelah diterima oleh server.
+
 // Tugas router hanya memilih proses yang tepat berdasarkan method dan URL.
 async function handleRequest(request, response) {
-	// URL asli dapat berupa /api/items/1?sort=name.
-	// URL constructor membantu kita memisahkan path dari query string.
+	
+    // mengambil URL nya saja = var URL
 	const requestUrl = new URL(request.url, `http://${request.headers.host}`);
 
-	// Contoh /api/items/1 akan menjadi ['api', 'items', '1'].
-	// Array ini memudahkan kita membaca bagian URL berdasarkan posisinya.
+	// mengambil part URL nya saja = var pathURL
 	const pathParts = requestUrl.pathname.split('/').filter(Boolean);
 
-	// Route dasar untuk memastikan server dapat memberikan response.
+	// jika dalam request method nya adalah get atau dan dan path dari url nya dalah "/"
 	if (request.method === 'GET' && requestUrl.pathname === '/') {
+        // maka gunakan ult sendJSON
+        // param sendJson (response, status, data)
 		sendJson(response, 200, {
+            // param data untuk sendJson
+            // JSON GET
 			message: 'Server aplikasi aktif',
 			next: 'Kita akan membangun fitur web secara bertahap.'
 		});
@@ -25,8 +29,10 @@ async function handleRequest(request, response) {
 	}
 
 	// Health check biasanya dipakai untuk memastikan service masih aktif.
+    // sama seperti sebelum nya 
 	if (request.method === 'GET' && requestUrl.pathname === '/api/health') {
 		sendJson(response, 200, {
+            //JSON HEALTH
 			status: 'ok',
 			service: 'web-template'
 		});

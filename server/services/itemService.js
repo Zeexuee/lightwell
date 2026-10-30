@@ -1,3 +1,6 @@
+// ------------- Halaman ini berisikan fungsi CRUD ------------ 
+// ------------- contoh logika bisnis CRUD -------------
+
 // Untuk sementara, data disimpan di array.
 // Nanti array ini dapat diganti dengan query database tanpa mengubah controller.
 let items = [];
