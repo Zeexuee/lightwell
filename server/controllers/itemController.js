@@ -22,7 +22,7 @@ async function createItem(request, response) {
 		const item = itemService.createItem(body.name);
 		sendJson(response, 201, { data: item });
 	} catch (error) {
-		sendJson(response, 400, { error: error.message });
+		sendJson(response, error.statusCode || 400, { error: error.message });
 	}
 }
 
@@ -41,7 +41,7 @@ async function updateItem(request, response, itemId) {
 		// Jika berhasil, kirim item yang sudah diperbarui.
 		sendJson(response, 200, { data: item });
 	} catch (error) {
-		sendJson(response, 400, { error: error.message });
+		sendJson(response, error.statusCode || 400, { error: error.message });
 	}
 }
 

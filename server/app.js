@@ -6,7 +6,7 @@ const { handleRequest } = require('./routes');
 
 // Ambil nomor port dari environment variable PORT.
 // Jika PORT belum tersedia,  gunakan port 3000.
-const port = process.env.PORT || 3000 // ini bisa diubah sesuai dengan kebutuhan;
+const port = process.env.PORT || 3000; // Ini dapat diubah melalui environment variable PORT.
 
 // Setiap request yang masuk akan diteruskan ke handleRequest.
 // Create Server, ambil var dari handle request

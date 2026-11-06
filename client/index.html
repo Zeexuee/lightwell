@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="id">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Template web sederhana dengan JavaScript vanilla dan Node.js">
+	<title>Web Template | Items</title>
+	<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+	<main class="page-shell">
+		<header class="page-header">
+			<div>
+				<p class="eyebrow">JavaScript Web Template</p>
+				<h1>Item Manager</h1>
+				<p class="intro">Contoh aplikasi kecil untuk memahami hubungan frontend, API, dan backend.</p>
+			</div>
+			<div class="status-badge" id="api-status">Memeriksa API...</div>
+		</header>
+
+		<section class="workspace" aria-labelledby="form-title">
+			<div class="panel form-panel">
+				<div class="panel-heading">
+					<p class="eyebrow">Data entry</p>
+					<h2 id="form-title">Tambah item</h2>
+				</div>
+
+				<form id="item-form">
+					<label for="item-name">Nama item</label>
+					<input id="item-name" name="name" type="text" placeholder="Contoh: Belajar API" required maxlength="120" autocomplete="off">
+					<div class="form-actions">
+						<button class="button primary" type="submit" id="submit-button">Simpan item</button>
+						<button class="button secondary hidden" type="button" id="cancel-button">Batal edit</button>
+					</div>
+				</form>
+				<p class="feedback" id="form-feedback" role="status" aria-live="polite"></p>
+			</div>
+
+			<div class="panel list-panel">
+				<div class="panel-heading list-heading">
+					<div>
+						<p class="eyebrow">API data</p>
+						<h2>Daftar item</h2>
+					</div>
+					<span class="count" id="item-count">0 item</span>
+				</div>
+				<ul class="item-list" id="item-list"></ul>
+				<p class="empty-state" id="empty-state">Belum ada item. Tambahkan item pertama.</p>
+			</div>
+		</section>
+	</main>
+
+	<script type="module" src="/js/items.js"></script>
+</body>
+</html>

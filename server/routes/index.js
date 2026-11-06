@@ -1,5 +1,6 @@
 // Controller berisi proses untuk setiap fitur.
 const itemController = require('../controllers/itemController');
+const { serveStatic } = require('../utils/static');
 
 // ambil Utilitis dari http.js
 // ult = readJson, sendJson
@@ -11,6 +12,12 @@ async function handleRequest(request, response) {
 	
     // mengambil URL nya saja = var URL
 	const requestUrl = new URL(request.url, `http://${request.headers.host}`);
+
+	// Layani file frontend seperti HTML, CSS, dan JavaScript terlebih dahulu.
+	// Jika file tidak ditemukan, proses dilanjutkan ke route API di bawah.
+	if (await serveStatic(request, response)) {
+		return;
+	}
 
 	// mengambil part URL nya saja = var pathURL
 	const pathParts = requestUrl.pathname.split('/').filter(Boolean);
