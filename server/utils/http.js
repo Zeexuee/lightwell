@@ -1,40 +1,52 @@
-// ----- halaman ini utill untuk buat header JSON dan cek req dan ubah menjadi JSON -------
-// Helper untuk setiap menggunakan send
-//@param@ response
-//@param@ status code
-//@param@ data
-//@note@ ini adalah template untuk send respone dalam bentuk JSON 
+// halaman ini akan berisikan alat bantu ketika menggunakan http
+//berisikan : sendJSON, createRequestError dan readJSON
+
+
+
+// utiliti : merubah bentuk respone ke dalam bentuk JSON
 function sendJson(response, statusCode, data) {
+
 	// Setelah client terputus, response bisa sudah dihancurkan.
-	// Jangan mencoba menulis ke koneksi yang sudah tidak tersedia.
+	// Memastikan untuk Jangan mencoba menulis ke koneksi yang sudah tidak tersedia.
 	if (response.destroyed || response.writableEnded) {
 		return;
 	}
 
-	// memasukan hasil status code ke dalam json.
+	// Status code menjelaskan hasil request kepada client.
 	response.statusCode = statusCode;
-
-	// Set Header menjadi JSON.
 	response.setHeader('Content-Type', 'application/json');
-
-	// mengubah semua data yang berhasil dihasilkan menjadi JSON.
 	response.end(JSON.stringify(data));
 }
 
-// Helper untuk membaca permintaan 
-// semua permintaan harus berbentuk JSON
-// @request@ hasil yang permintaan yang diterima server
-function readJson(request) {
+// Membuat Error yang membawa HTTP status code.
+// Controller dapat memakai statusCode ini tanpa menebak jenis error.
+function createRequestError(message, statusCode) {
+	const error = new Error(message);
+	error.statusCode = statusCode;
+	return error;
+}
+
+// Membaca body request JSON dengan batas ukuran dan batas waktu.
+// Batas ini mencegah client menahan koneksi terlalu lama atau memenuhi memory.
+function readJson(request, options = {}) {
+	
+	// default batasan besar adalah 1jt bytes
+	// default batasan waktu adalah 10 detik
+	const maxBytes = options.maxBytes || 1_000_000;
+	const timeoutMs = options.timeoutMs || 10_000;
+
+
+
 	return new Promise((resolve, reject) => {
-		// buat kotak kosong
-        // karena data terkirim ke server terkadang dalam bentuk potongan
-        // maka siapkan var kosong, agar nanti bisa digabungkan
-		let body = '';
+		// Data request datang dalam beberapa chunk Buffer.
+		// Array ini menampung chunk tanpa menggabungkan string berulang kali.
+		const chunks = [];
+		let receivedBytes = 0;
 		let settled = false;
+		let timeoutId;
 
 		// Promise hanya boleh diselesaikan satu kali.
-		// Ini penting karena koneksi putus dapat memicu lebih dari satu event,
-		// misalnya `aborted`, lalu `error` atau `close`.
+		// Koneksi putus dapat memicu beberapa event sekaligus.
 		function settle(callback, value) {
 			if (settled) {
 				return;
@@ -45,8 +57,9 @@ function readJson(request) {
 			callback(value);
 		}
 
-		// Setelah request selesai atau gagal, listener tidak lagi diperlukan.
+		// Setelah request selesai atau gagal, listener dan timer tidak diperlukan.
 		function cleanup() {
+			clearTimeout(timeoutId);
 			request.removeListener('data', handleData);
 			request.removeListener('end', handleEnd);
 			request.removeListener('aborted', handleAborted);
@@ -54,55 +67,59 @@ function readJson(request) {
 			request.removeListener('close', handleClose);
 		}
 
-        // Setiap chunk digabungkan menjadi satu string JSON.
+		// Setiap chunk dihitung dan disimpan sampai body selesai diterima.
 		function handleData(chunk) {
-			body += chunk;
+			receivedBytes += chunk.length;
+
+			if (receivedBytes > maxBytes) {
+				settle(reject, createRequestError('Ukuran body terlalu besar', 413));
+				request.destroy();
+				return;
+			}
+
+			chunks.push(chunk);
 		}
 
-        // Jika seluruh body sudah diterima, ubah JSON text menjadi object.
+		// Jika seluruh body sudah diterima, gabungkan Buffer lalu parse sebagai JSON.
 		function handleEnd() {
 			try {
-				// Body kosong dianggap sebagai object kosong.
-				// Jika ada isi, JSON.parse mengubah teks menjadi object JavaScript.
+				const body = Buffer.concat(chunks).toString('utf8');
 				settle(resolve, body ? JSON.parse(body) : {});
 			} catch {
-				// JSON rusak tetap diteruskan ke catch pada controller.
-				settle(reject, new Error('Body harus berupa JSON yang valid'));
+				settle(reject, createRequestError('Body harus berupa JSON yang valid', 400));
 			}
 		}
 
-        // Event ini terjadi ketika client membatalkan request sebelum selesai.
+		// Event ini terjadi ketika client membatalkan request sebelum selesai.
 		function handleAborted() {
-			settle(reject, new Error('Request dibatalkan sebelum body selesai diterima'));
+			settle(reject, createRequestError('Request dibatalkan sebelum body selesai diterima', 400));
 		}
 
-        // Error socket atau stream juga harus menghentikan Promise.
+		// Error socket atau stream juga harus menghentikan Promise.
 		function handleError(error) {
-			settle(reject, error);
+			settle(reject, createRequestError(error.message, 400));
 		}
 
-        // `close` dapat terjadi tanpa `end` ketika koneksi terputus.
+		// `close` dapat terjadi tanpa `end` ketika koneksi terputus.
 		function handleClose() {
 			if (!request.complete) {
 				handleAborted();
 			}
 		}
 
-        // ketika req berjalan (on)
-        // gabungkan semua pecahan ke dalam kotak kosong yang sudah disiapkan sebelumnya => var boady
+		// Timeout menghentikan request yang mengirim data terlalu lambat.
+		function handleTimeout() {
+			settle(reject, createRequestError('Request timeout saat membaca body', 408));
+			request.destroy();
+		}
+
 		request.on('data', handleData);
-
-        // ketika req selesai (end)
-        // bagian ini untuk memastikan bahwa yang diterima adalah JSON
 		request.once('end', handleEnd);
-
-		// Tangani client yang memutus koneksi saat chunk belum lengkap.
 		request.once('aborted', handleAborted);
 		request.once('error', handleError);
 		request.once('close', handleClose);
+		timeoutId = setTimeout(handleTimeout, timeoutMs);
 	});
 }
-// ----- fitur utilitas HTTP harus dikembangkan lagi -----
 
-// Export membuat kedua helper dapat digunakan oleh controller dan router.
 module.exports = { readJson, sendJson };
