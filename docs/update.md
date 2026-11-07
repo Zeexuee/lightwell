@@ -122,6 +122,18 @@ client/
 
 `api.js` menjadi satu tempat untuk komunikasi `fetch()` dengan backend. `items.js` mengatur form, menampilkan data, dan memanggil operasi CRUD. Server menyajikan file frontend melalui `server/utils/static.js`.
 
+## Repository Layer
+
+Penyimpanan item sekarang dipisahkan ke `server/repositories/itemRepository.js`.
+
+```text
+controller
+→ service (aturan bisnis dan validasi)
+→ repository (cara data disimpan)
+```
+
+Repository saat ini masih menggunakan array sebagai latihan. Ketika MySQL siap digunakan, controller dan frontend tidak perlu berubah; yang diganti cukup implementasi repository.
+
 Alurnya sekarang:
 
 ```text

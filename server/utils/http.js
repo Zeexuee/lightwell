@@ -1,22 +1,20 @@
 // halaman ini akan berisikan alat bantu ketika menggunakan http
 //berisikan : sendJSON, createRequestError dan readJSON
 
-
-
-// utiliti : merubah bentuk respone ke dalam bentuk JSON
+// utiliti : fungsi yang harus digunakan setiap kali dalam megirimkan respone
+// memastikan semua respone kembali dalam bentuk dalam bentuk JSON
 function sendJson(response, statusCode, data) {
-
-	// Setelah client terputus, response bisa sudah dihancurkan.
+	// Jika client terputus, response bisa sudah dihancurkan.
 	// Memastikan untuk Jangan mencoba menulis ke koneksi yang sudah tidak tersedia.
 	if (response.destroyed || response.writableEnded) {
 		return;
 	}
-
 	// Status code menjelaskan hasil request kepada client.
 	response.statusCode = statusCode;
 	response.setHeader('Content-Type', 'application/json');
 	response.end(JSON.stringify(data));
 }
+
 
 // Membuat Error yang membawa HTTP status code.
 // Controller dapat memakai statusCode ini tanpa menebak jenis error.
@@ -28,7 +26,7 @@ function createRequestError(message, statusCode) {
 
 // Membaca body request JSON dengan batas ukuran dan batas waktu.
 // Batas ini mencegah client menahan koneksi terlalu lama atau memenuhi memory.
-function readJson(request, options = {}) {
+function readJson(request, options = {} /** bisa menetukan besaran maksimal bytes dan timeout */) {
 	
 	// default batasan besar adalah 1jt bytes
 	// default batasan waktu adalah 10 detik
@@ -57,7 +55,7 @@ function readJson(request, options = {}) {
 			callback(value);
 		}
 
-		// Setelah request selesai atau gagal, listener dan timer tidak diperlukan.
+		// untuk membersihkan memori setelah semua tugas selesai
 		function cleanup() {
 			clearTimeout(timeoutId);
 			request.removeListener('data', handleData);
@@ -67,7 +65,7 @@ function readJson(request, options = {}) {
 			request.removeListener('close', handleClose);
 		}
 
-		// Setiap chunk dihitung dan disimpan sampai body selesai diterima.
+		// fungsi handle data ketika listener mengembalikan data
 		function handleData(chunk) {
 			receivedBytes += chunk.length;
 
@@ -80,7 +78,8 @@ function readJson(request, options = {}) {
 			chunks.push(chunk);
 		}
 
-		// Jika seluruh body sudah diterima, gabungkan Buffer lalu parse sebagai JSON.
+
+		// Jika seluruh body sudah diterima, gabungkan Buffer lalu parse sebagai JSON. XXX
 		function handleEnd() {
 			try {
 				const body = Buffer.concat(chunks).toString('utf8');
@@ -90,24 +89,24 @@ function readJson(request, options = {}) {
 			}
 		}
 
-		// Event ini terjadi ketika client membatalkan request sebelum selesai.
+		// Event ini terjadi ketika client membatalkan request sebelum selesai. XXXX
 		function handleAborted() {
 			settle(reject, createRequestError('Request dibatalkan sebelum body selesai diterima', 400));
 		}
 
-		// Error socket atau stream juga harus menghentikan Promise.
+		// Error socket atau stream juga harus menghentikan Promise. XXXX
 		function handleError(error) {
 			settle(reject, createRequestError(error.message, 400));
 		}
 
-		// `close` dapat terjadi tanpa `end` ketika koneksi terputus.
+		// `close` dapat terjadi tanpa `end` ketika koneksi terputus. XXXX
 		function handleClose() {
 			if (!request.complete) {
 				handleAborted();
 			}
 		}
 
-		// Timeout menghentikan request yang mengirim data terlalu lambat.
+		// Timeout menghentikan request yang mengirim data terlalu lambat. XXXX
 		function handleTimeout() {
 			settle(reject, createRequestError('Request timeout saat membaca body', 408));
 			request.destroy();
@@ -117,9 +116,11 @@ function readJson(request, options = {}) {
 		request.once('end', handleEnd);
 		request.once('aborted', handleAborted);
 		request.once('error', handleError);
-		request.once('close', handleClose);
+		request.once('close', handleClose); 
 		timeoutId = setTimeout(handleTimeout, timeoutMs);
 	});
+
 }
+
 
 module.exports = { readJson, sendJson };
