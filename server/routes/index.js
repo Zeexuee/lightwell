@@ -54,7 +54,7 @@ async function handleRequest(request, response) {
 
 		// GET /api/items berarti mengambil semua item.
 		if (request.method === 'GET' && pathParts.length === 2) {
-			itemController.listItems(request, response);
+			await itemController.listItems(request, response);
 			return;
 		}
 
@@ -73,7 +73,7 @@ async function handleRequest(request, response) {
 
 		// DELETE /api/items/:id berarti menghapus item tertentu.
 		if (request.method === 'DELETE' && pathParts.length === 3 && Number.isInteger(itemId)) {
-			itemController.removeItem(request, response, itemId);
+			await itemController.removeItem(request, response, itemId);
 			return;
 		}
 	}

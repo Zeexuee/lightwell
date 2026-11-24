@@ -16,23 +16,23 @@ function validateName(name) {
 }
 
 // READ: kembalikan seluruh item yang tersimpan.
-function getItems() {
+async function getItems() {
 	return itemRepository.findAll();
 }
 
-// CREATE: validasi nama, buat object baru, simpan ke array, lalu kembalikan object.
-function createItem(name) {
+// CREATE: validasi nama, buat object baru, lalu simpan melalui repository.
+async function createItem(name) {
 	return itemRepository.create({ name: validateName(name) });
 }
 
 // UPDATE: cari item berdasarkan ID.
 // null digunakan sebagai tanda bahwa item dengan ID tersebut tidak ada.
-function updateItem(id, name) {
+async function updateItem(id, name) {
 	return itemRepository.update(id, { name: validateName(name) });
 }
 
-// DELETE: cari posisi item agar dapat dihapus menggunakan splice().
-function deleteItem(id) {
+// DELETE: hapus item melalui repository.
+async function deleteItem(id) {
 	return itemRepository.remove(id);
 }
 

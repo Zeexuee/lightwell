@@ -1,3 +1,6 @@
+// Load .env paling awal agar konfigurasi terbaca sebelum module lain dimuat.
+require('dotenv').config();
+
 // Menggunakan bawaan modul node = HTTP
 const http = require('node:http');
 

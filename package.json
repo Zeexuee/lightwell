@@ -3,7 +3,16 @@
 	"version": "0.0.1",
 	"private": true,
 	"description": "projek ini di dedikasikan untuk belajar pribadi, dan silahkan gunakan jika butuh template yang masih kosong",
+	"dependencies": {
+		"dotenv": "^17.2.3",
+		"mysql2": "^3.15.3"
+	},
 	"scripts": {
-		"start": "node server/app.js"
+		"start": "node server/app.js",
+		"db:migrate": "node database/migrate.js"
+	},
+	"dependencies": {
+		"dotenv": "^18.0.10",
+		"mysql2": "^3.24.6"
 	}
 }
