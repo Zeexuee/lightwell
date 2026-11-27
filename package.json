@@ -2,13 +2,11 @@
 	"name": "lightwell",
 	"version": "0.0.1",
 	"private": true,
-	"description": "projek ini di dedikasikan untuk belajar pribadi, dan silahkan gunakan jika butuh template yang masih kosong",
-	"dependencies": {
-		"dotenv": "^17.2.3",
-		"mysql2": "^3.15.3"
-	},
+	"description": "Template web untuk belajar JavaScript, Node.js, database, dan arsitektur backend",
 	"scripts": {
 		"start": "node server/app.js",
+		"dev": "node --watch server/app.js",
+		"check": "node --check server/app.js && node --check server/routes/index.js && node --check server/controllers/itemController.js && node --check server/services/itemService.js && node --check server/repositories/itemRepository.js",
 		"db:migrate": "node database/migrate.js"
 	},
 	"dependencies": {
