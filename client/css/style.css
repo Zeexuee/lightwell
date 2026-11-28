@@ -234,6 +234,65 @@ input:focus {
 	font-size: 0.92rem;
 }
 
+header-actions,
+.header-actions {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.auth-shell {
+	min-height: 100vh;
+	display: grid;
+	place-items: center;
+	padding: 24px;
+}
+
+.auth-panel {
+	width: min(420px, 100%);
+	border: 1px solid rgba(151, 177, 169, 0.6);
+	border-radius: 8px;
+	padding: 32px;
+	background: rgba(255, 255, 255, 0.88);
+	box-shadow: 0 18px 50px rgba(48, 73, 65, 0.12);
+}
+
+.auth-panel h1 {
+	font-size: clamp(2.4rem, 12vw, 4.2rem);
+	margin-bottom: 20px;
+}
+
+.auth-tabs {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	margin-bottom: 22px;
+	border-bottom: 1px solid #dce6e2;
+}
+
+.auth-tab {
+	border: 0;
+	border-bottom: 2px solid transparent;
+	padding: 12px;
+	color: #82918f;
+	background: transparent;
+	cursor: pointer;
+	font-weight: 800;
+}
+
+.auth-tab.active {
+	border-bottom-color: #bd5b36;
+	color: #17212b;
+}
+
+.auth-panel label {
+	margin-top: 14px;
+}
+
+.full-width {
+	width: 100%;
+	margin-top: 18px;
+}
+
 @media (max-width: 760px) {
 	.page-shell {
 		width: min(100% - 28px, 560px);

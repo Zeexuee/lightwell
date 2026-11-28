@@ -6,11 +6,13 @@
 	"scripts": {
 		"start": "node server/app.js",
 		"dev": "node --watch server/app.js",
-		"check": "node --check server/app.js && node --check server/routes/index.js && node --check server/controllers/itemController.js && node --check server/services/itemService.js && node --check server/repositories/itemRepository.js",
+		"check": "node --check server/app.js && node --check server/routes/index.js && node --check server/controllers/itemController.js && node --check server/controllers/authController.js && node --check server/services/itemService.js && node --check server/services/authService.js && node --check server/repositories/itemRepository.js && node --check server/repositories/userRepository.js && node --check server/middleware/authMiddleware.js",
 		"db:migrate": "node database/migrate.js"
 	},
 	"dependencies": {
+		"bcryptjs": "^3.0.3",
 		"dotenv": "^18.0.10",
+		"jsonwebtoken": "^9.0.3",
 		"mysql2": "^3.24.6"
 	}
 }

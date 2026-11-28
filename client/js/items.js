@@ -9,6 +9,11 @@ const itemList = document.querySelector('#item-list');
 const itemCount = document.querySelector('#item-count');
 const emptyState = document.querySelector('#empty-state');
 const apiStatus = document.querySelector('#api-status');
+const logoutButton = document.querySelector('#logout-button');
+
+if (!localStorage.getItem('lightwell_token')) {
+	window.location.href = '/login.html';
+}
 
 let editingId = null;
 let items = [];
@@ -143,6 +148,11 @@ cancelButton.addEventListener('click', () => {
 	form.reset();
 	setFormMode();
 	showFeedback('Mode edit dibatalkan.');
+});
+
+logoutButton?.addEventListener('click', () => {
+	localStorage.removeItem('lightwell_token');
+	window.location.href = '/login.html';
 });
 
 itemList.addEventListener('click', (event) => {

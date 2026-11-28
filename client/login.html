@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="id">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Lightwell | Authentication</title>
+	<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+	<main class="auth-shell">
+		<section class="auth-panel" aria-labelledby="auth-title">
+			<p class="eyebrow">JavaScript Web Template</p>
+			<h1 id="auth-title">Masuk</h1>
+
+			<div class="auth-tabs" role="tablist" aria-label="Mode authentication">
+				<button class="auth-tab active" type="button" id="login-tab" role="tab">Masuk</button>
+				<button class="auth-tab" type="button" id="register-tab" role="tab">Daftar</button>
+			</div>
+
+			<form id="auth-form">
+				<div id="name-field" class="hidden">
+					<label for="name">Nama</label>
+					<input id="name" name="name" type="text" minlength="2" autocomplete="name">
+				</div>
+
+				<label for="email">Email</label>
+				<input id="email" name="email" type="email" required autocomplete="email">
+
+				<label for="password">Password</label>
+				<input id="password" name="password" type="password" minlength="8" required autocomplete="current-password">
+
+				<button class="button primary full-width" type="submit" id="auth-submit">Masuk</button>
+			</form>
+
+			<p class="feedback" id="auth-feedback" role="status" aria-live="polite"></p>
+		</section>
+	</main>
+
+	<script type="module" src="/js/login.js"></script>
+</body>
+</html>
