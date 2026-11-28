@@ -1,5 +1,7 @@
 // Controller berisi proses untuk setiap fitur.
 const itemController = require('../controllers/itemController');
+const authController = require('../controllers/authController');
+const { requireAuth } = require('../middleware/authMiddleware');
 const { serveStatic } = require('../utils/static');
 
 // ambil Utilitis dari http.js
@@ -46,8 +48,34 @@ async function handleRequest(request, response) {
 		return;
 	}
 
-	// Semua route item harus dimulai dengan /api/items.
+	// Authentication: membuat akun baru.
+	if (request.method === 'POST' && requestUrl.pathname === '/api/auth/register') {
+		await authController.register(request, response);
+		return;
+	}
+
+	// Authentication: memverifikasi password dan membuat JWT.
+	if (request.method === 'POST' && requestUrl.pathname === '/api/auth/login') {
+		await authController.login(request, response);
+		return;
+	}
+
+	// Authentication: membaca user dari JWT, tanpa mengirim password.
+	if (request.method === 'GET' && requestUrl.pathname === '/api/auth/me') {
+		const user = requireAuth(request, response);
+		if (!user) {
+			return;
+		}
+		await authController.me(request, response);
+		return;
+	}
+
+	// Semua route item harus dimulai dengan /api/items dan membutuhkan login.
 	if (pathParts[0] === 'api' && pathParts[1] === 'items') {
+		const user = requireAuth(request, response);
+		if (!user) {
+			return;
+		}
 		// Number('1') menghasilkan 1, sedangkan Number('abc') menghasilkan NaN.
 		// Nilai ini hanya digunakan oleh route yang membutuhkan ID.
 		const itemId = Number(pathParts[2]);
